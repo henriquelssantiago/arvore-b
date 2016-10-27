@@ -3,22 +3,22 @@ package br.com.ed.arvoreb;
 //import java.util.Arrays;
 import java.util.List;
 public class ArvoreB {
-		
+
 	Pagina raiz;
 	int ordem;
-	
+
 	ArvoreB(int ordem){
 		this.ordem = ordem;
 		raiz = new Pagina(null);
 	}
-	
+
 	public Pagina buscarPag(Pagina pag, int chave){    //retorna a pagina em que uma chave x deve se encontrar 
 		int ramo = 0;
-		
+
 		while(ramo < pag.chaves.size() && chave < (int)pag.chaves.get(ramo)){ //enquanto o contador de ramos for menor que a quantidade de chaves na pagina
 			ramo ++;										//e a chave sendo procurada for menor que as chaves contidas na pagina, o contador de ramos é incrementado 
 		}
-		
+
 		if(chave == (int)pag.chaves.get(ramo)){ // a chave está nessa pag
 			return pag;
 		}
@@ -27,31 +27,25 @@ public class ArvoreB {
 		}
 		else
 			return buscarPag(pag.getFilho(ramo), chave);
-			
+
 	}
-	
+
 	public Pagina buscarPagIdeal(Pagina pag, int chave){ // passar a raiz e a chave que se deseja inserir 
-		
 		if(pag.folha){
 			return pag;
 		}
-			
-		
 		int ramo = 	0;
-		
 		while(ramo < pag.chaves.size() && chave > pag.chaves.get(ramo)){ //ramo vai incrementando 
 			ramo++;
 		}
-		
-		
 		return buscarPagIdeal(pag.getFilho(ramo), chave);
 	}
-	
+
 	public int buscarPos(Pagina pag, int chave){ // retorna a posição na pagina
 		int poschave = 0;
 		while(poschave < pag.chaves.size() && chave > (int)pag.chaves.get(poschave))
 			poschave++;
-		
+
 		return poschave;
 	}
 	/*
@@ -66,7 +60,7 @@ public class ArvoreB {
 		int poschave = buscarPos(pag, chave);
 		inserir(chave, pag, poschave);
 	}
-	
+
 	/*
 	 * Método(Sobrecarregado) auxiliar de inserir
 	 * faz a inserção no vetor de chaves da página ideal
@@ -76,54 +70,107 @@ public class ArvoreB {
 	 */
 	private void inserir(int chave, Pagina pag, int poschave) {
 		pag.chaves.add(poschave, chave);
-		if(pag.chaves.size() == ordem - 1){
-			maquiavel(pag, chave, poschave);
+		if(pag.chaves.size() == ordem){
+			maquiavel(pag);
 		}
 	}
-	
+
 	/*
-	 * Faz a divisão da página que está cheia em duas
+	 * Faz a divisão da página que está cheia em duas('x' e 'z')
 	 * e insere a chave que irá 'subir' para a página pai
 	 */
-	private void maquiavel(Pagina pag, int chave, int poschave){
-		Pagina x = new Pagina(pag.pai);
-		Pagina z = new Pagina(pag.pai);
+	private void maquiavel(Pagina pag){//pag = raiz
+		Pagina x = new Pagina(pag);
+		Pagina z = new Pagina(pag);
 		int termocentral=(ordem/2);
-		
+
 		//'x' e 'z' serão as duas páginas criadas
 		for(int i=0; i<termocentral; i++){
 			x.chaves.add(pag.chaves.get(i));
 		}
-		for(int i=termocentral+1; i<ordem;i++){
+		for(int i=termocentral+1; i<ordem; i++){
 			z.chaves.add(pag.chaves.get(i));
 		}
-		
-		//busca a posição ideal das páginas no vetor de filhos da página pai
 		int posf = 0;
-		while(pag.pai.filhos.get(posf) != pag){
-			posf++;
+		//se for raiz, a página não sumirá
+		//		if(pag == raiz){
+		//			for(int i=0; i<termocentral; i++){
+		//				pag.chaves.removeFirst();
+		//			}
+		//			for(int i=1; i<termocentral; i++){
+		//				pag.chaves.remove(i);
+		//			}
+		//		}else{
+		//			//busca a posição ideal das páginas no vetor de filhos da página pai
+		//			while(posf < pag.pai.filhos.size() && pag.pai.filhos.get(posf) != pag){
+		//				posf++;
+		//			}
+		//		}
+
+		if(pag != raiz){
+			while(pag.pai.filhos.get(posf) != pag){
+				posf++;
+			}
+		}else{
+			posf = 0;
 		}
-		
-		//ligações e desligamentos dos ponteiros
-		pag.pai.filhos.add(posf,x);
-		pag.pai.filhos.add(posf+1,z);
-		pag.filhos=null;
-		pag.pai=null;
-		
+
+		//caso não seja folha, as páginas 'x' e 'z' terão filhos	
+		if(!pag.folha){
+			for(int i=0; i<=termocentral; i++){
+				x.filhos.add(i, pag.filhos.get(i));
+				x.filhos.get(i).pai = x;
+			}
+			for(int i=termocentral+1; i<=ordem; i++){
+				z.filhos.add(i,pag.filhos.get(i));
+				z.filhos.get(i).pai = z;
+			}
+		}
+
 		//posição ideal do termo que irá 'subir' na página pai
 		int posc = 0;
-		while(pag.chaves.get(posc) > pag.chaves.get(termocentral)){
-			posc++;
+		if(pag != raiz){
+			while(posc < pag.pai.chaves.size() && pag.pai.chaves.get(posc) > pag.chaves.get(termocentral)){
+				posc++;
+			}
 		}
+
+		//ligações e desligamentos dos ponteiros
+		if(pag != raiz){
+			pag.pai.filhos.add(posf,x);
+			pag.pai.filhos.add(posf+1,z);
+			pag.filhos=null;
+			pag.pai=null;
+		}else{
+			raiz = new Pagina(null);
+			x.pai = raiz;
+			z.pai = raiz;
+			raiz.filhos.add(posf,x);
+			raiz.filhos.add(posf+1,z);
+
+		}
+
+		
 		inserir(pag.chaves.get(termocentral),x.pai,posc);
-	}
-	
+	}	
 	//metodo teste
 	public int pos(int chave, List<Integer> ll){ 
 		int poschave = 0;
 		while(poschave < ll.size() &&  chave > (int)ll.get(poschave)){
 			poschave++;}
-		
+
 		return poschave ;
 	}
+	
+	public void imprimir(Pagina pagina){
+		for(int i=0; i<pagina.chaves.size(); i++){
+			System.out.println(pagina.chaves.get(i));
+		}
+		
+		for(int i=0; i<pagina.filhos.size(); i++){
+			System.out.println();
+			imprimir(pagina.filhos.get(i));
+		}
+	}
+	
 }
