@@ -91,22 +91,8 @@ public class ArvoreB {
 		for(int i=termocentral+1; i<ordem; i++){
 			z.chaves.add(pag.chaves.get(i));
 		}
+		
 		int posf = 0;
-		//se for raiz, a página não sumirá
-		//		if(pag == raiz){
-		//			for(int i=0; i<termocentral; i++){
-		//				pag.chaves.removeFirst();
-		//			}
-		//			for(int i=1; i<termocentral; i++){
-		//				pag.chaves.remove(i);
-		//			}
-		//		}else{
-		//			//busca a posição ideal das páginas no vetor de filhos da página pai
-		//			while(posf < pag.pai.filhos.size() && pag.pai.filhos.get(posf) != pag){
-		//				posf++;
-		//			}
-		//		}
-
 		if(pag != raiz){
 			while(pag.pai.filhos.get(posf) != pag){
 				posf++;
@@ -129,14 +115,19 @@ public class ArvoreB {
 
 		//posição ideal do termo que irá 'subir' na página pai
 		int posc = 0;
+		//instável
 		if(pag != raiz){
 			while(posc < pag.pai.chaves.size() && pag.pai.chaves.get(posc) > pag.chaves.get(termocentral)){
 				posc++;
+				System.out.println(posc);
 			}
 		}
 
 		//ligações e desligamentos dos ponteiros
+		//instável
 		if(pag != raiz){
+			x.pai = pag.pai;
+			z.pai = pag.pai;
 			pag.pai.filhos.add(posf,x);
 			pag.pai.filhos.add(posf+1,z);
 			pag.filhos=null;
@@ -147,10 +138,9 @@ public class ArvoreB {
 			z.pai = raiz;
 			raiz.filhos.add(posf,x);
 			raiz.filhos.add(posf+1,z);
+			raiz.folha = false;
 
 		}
-
-		
 		inserir(pag.chaves.get(termocentral),x.pai,posc);
 	}	
 	//metodo teste
