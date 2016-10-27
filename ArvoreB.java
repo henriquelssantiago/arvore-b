@@ -1,15 +1,13 @@
-package br.com.ed.arvoreb;
-
-//import java.util.Arrays;
+package implementacao;
 import java.util.List;
 public class ArvoreB {
 
 	Pagina raiz;
-	int ordem;
+	Integer ordem;
 
 	ArvoreB(int ordem){
 		this.ordem = ordem;
-		raiz = new Pagina(null);
+		this.raiz  = new Pagina(null);
 	}
 
 	public Pagina buscarPag(Pagina pag, int chave){    //retorna a pagina em que uma chave x deve se encontrar 
@@ -108,8 +106,8 @@ public class ArvoreB {
 				x.filhos.get(i).pai = x;
 			}
 			for(int i=termocentral+1; i<=ordem; i++){
-				z.filhos.add(i,pag.filhos.get(i));
-				z.filhos.get(i).pai = z;
+ 				z.filhos.add(i-(termocentral+1),pag.filhos.get(i));
+				z.filhos.get(i-(termocentral+1)).pai = z;
 			}
 		}
 
@@ -117,9 +115,9 @@ public class ArvoreB {
 		int posc = 0;
 		//instável
 		if(pag != raiz){
-			while(posc < pag.pai.chaves.size() && pag.pai.chaves.get(posc) > pag.chaves.get(termocentral)){
+			while(posc < pag.pai.chaves.size() && pag.chaves.get(termocentral) > pag.pai.chaves.get(posc) ){
 				posc++;
-				System.out.println(posc);
+//				System.out.println(posc);
 			}
 		}
 
@@ -139,7 +137,6 @@ public class ArvoreB {
 			raiz.filhos.add(posf,x);
 			raiz.filhos.add(posf+1,z);
 			raiz.folha = false;
-
 		}
 		inserir(pag.chaves.get(termocentral),x.pai,posc);
 	}	
